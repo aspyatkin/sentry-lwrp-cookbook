@@ -1,0 +1,19 @@
+#!/usr/bin/env sh
+if [ -z "$1" ]; then
+  OUT_DIR="$PWD"
+else
+  OUT_DIR="$1"
+fi
+
+if [ ! -d "$OUT_DIR" ]; then
+  echo "The specified path is not a directory!"
+  exit 2
+fi
+
+cd $OUT_DIR
+DB_DUMP_FILE=`date +"%Y_%m_%d__%H_%M_%S.sql"`
+PGPASSWORD="<%= @pg_password %>" pg_dump -h <%= @pg_host %> -p <%= @pg_port %> -U <%= @pg_username %> -d <%= @pg_dbname %> > $DB_DUMP_FILE
+
+RESULT_FILE="$DB_DUMP_FILE.tar.gz"
+tar -zcvf $RESULT_FILE $DB_DUMP_FILE
+rm $DB_DUMP_FILE
