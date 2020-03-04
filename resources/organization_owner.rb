@@ -12,13 +12,23 @@ default_action :create
 
 action :create do
   service_dir = ::File.join(new_resource.base_dir, new_resource.server)
+  virtualenv_path = ::File.join(service_dir, '.venv')
 
-  python_execute "Create Sentry@#{new_resource.server} organization <#{new_resource.organization}> owner <#{new_resource.username}>" do
-    command "cli.py update organization \"#{new_resource.organization}\" --owner #{new_resource.username}"
+  env_command = {
+    'SENTRY_CONF' => service_dir,
+    'HOME' => service_dir
+  }
+
+  bash "Create Sentry@#{new_resource.server} organization <#{new_resource.organization}> owner <#{new_resource.username}>" do
+    code <<-EOH
+      source #{virtualenv_path}/bin/activate
+      python cli.py update organization "#{new_resource.organization}" --owner #{new_resource.username}
+      deactivate
+    EOH
     cwd service_dir
     user new_resource.service_user
     group new_resource.service_group
-    environment 'SENTRY_CONF' => service_dir
+    environment env_command
     action :run
   end
 end

@@ -93,11 +93,13 @@ action :install do
 
   virtualenv_path = ::File.join(service_dir, '.venv')
 
-  python_virtualenv virtualenv_path do
-    python '2'
+  bash "create virtualenv at #{virtualenv_path}" do
+    code "virtualenv #{virtualenv_path}"
     user new_resource.user
     group new_resource.group
-    action :create
+    environment 'HOME' => service_dir
+    action :run
+    not_if { ::File.exist?(virtualenv_path) }
   end
 
   requirements_file = ::File.join(service_dir, 'requirements.txt')
@@ -114,11 +116,16 @@ action :install do
     action :create
   end
 
-  pip_requirements requirements_file do
+  bash "install pip requirements at #{virtualenv_path}" do
+    code <<-EOH
+      source #{virtualenv_path}/bin/activate
+      pip install -r #{requirements_file}
+      deactivate
+    EOH
     user new_resource.user
     group new_resource.group
-    virtualenv virtualenv_path
-    action :install
+    environment 'HOME' => service_dir
+    action :run
   end
 
   conf_file = ::File.join(service_dir, 'sentry.conf.py')
@@ -150,11 +157,16 @@ action :install do
 
   secret_key_file = ::File.join(service_dir, '.secret')
 
-  python_execute "Create Sentry@#{new_resource.name} secret key" do
-    command "-m sentry config generate-secret-key > #{secret_key_file}"
+  bash "Create Sentry@#{new_resource.name} secret key" do
+    code <<-EOH
+      source #{virtualenv_path}/bin/activate
+      python -m sentry config generate-secret-key > #{secret_key_file}
+      deactivate
+    EOH
     cwd service_dir
     user new_resource.user
     group new_resource.group
+    environment 'HOME' => service_dir
     action :run
     not_if { ::File.exist?(secret_key_file) }
   end
@@ -186,13 +198,18 @@ action :install do
     action :create
   end
 
-  python_execute "Run Sentry@#{new_resource.name} database migration" do
-    command '-m sentry upgrade --noinput'
+  bash "Run Sentry@#{new_resource.name} database migration" do
+    code <<-EOH
+      source #{virtualenv_path}/bin/activate
+      python -m sentry upgrade --noinput
+      deactivate
+    EOH
     cwd service_dir
     user new_resource.user
     group new_resource.group
     environment(
-      'SENTRY_CONF' => service_dir
+      'SENTRY_CONF' => service_dir,
+      'HOME' => service_dir
     )
     action :run
   end
