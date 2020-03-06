@@ -42,6 +42,7 @@ action :configure do
   end
 
   s3backup_item "backup_sentry_#{new_resource.server}" do
+    python '2'
     backup_command backup_script
     aws_iam_access_key_id new_resource.aws_iam_access_key_id
     aws_iam_secret_access_key new_resource.aws_iam_secret_access_key
