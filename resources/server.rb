@@ -38,6 +38,8 @@ property :smtp_username, String, required: true
 property :smtp_password, String, required: true
 property :smtp_tls, [TrueClass, FalseClass], default: false
 
+property :vlt_provider, Proc, default: lambda { nil }
+
 property :packages, Array, default: %w[
   libxml2
   libxml2-dev
@@ -337,14 +339,16 @@ action :install do
     )
 
     tls_rsa_certificate new_resource.fqdn do
+      vlt_provider new_resource.vlt_provider
       action :deploy
     end
 
-    tls = ::ChefCookbook::TLS.new(node)
+    tls = ::ChefCookbook::TLS.new(node, vlt_provider: new_resource.vlt_provider)
     vhost_vars[:certificate_entries] << tls.rsa_certificate_entry(new_resource.fqdn)
 
     if tls.has_ec_certificate?(new_resource.fqdn)
       tls_ec_certificate new_resource.fqdn do
+        vlt_provider new_resource.vlt_provider
         action :deploy
       end
 
