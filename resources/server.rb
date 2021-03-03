@@ -13,6 +13,7 @@ property :group, String, default: 'sentry'
 property :host, String, default: '127.0.0.1'
 property :port, Integer, default: 9000
 
+property :listen, [String, NilClass], default: nil
 property :secure, [TrueClass, FalseClass], default: true
 property :hsts_max_age, Integer, default: 15_768_000
 property :oscp_stapling, [TrueClass, FalseClass], default: true
@@ -322,6 +323,7 @@ action :install do
 
   vhost_vars = {
     fqdn: new_resource.fqdn,
+    listen: new_resource.listen,
     sentry_host: new_resource.host,
     sentry_port: new_resource.port,
     secure: new_resource.secure,

@@ -1,6 +1,6 @@
 <% if @secure %>
 server {
-  listen 80;
+  listen <%= @listen.nil? ? '' : "#{@listen}:" %>80;
 
   server_name <%= @fqdn %>;
 
@@ -12,9 +12,9 @@ server {
 
 server {
   <% if @secure %>
-  listen 443 ssl http2;
+  listen <%= @listen.nil? ? '' : "#{@listen}:" %>443 ssl http2;
   <% else %>
-  listen 80;
+  listen <%= @listen.nil? ? '' : "#{@listen}:" %>80;
   <% end %>
   server_name <%= @fqdn %>;
 
