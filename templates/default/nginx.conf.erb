@@ -18,8 +18,13 @@ server {
   <% end %>
   server_name <%= @fqdn %>;
 
+  <% unless @additional_access_log.nil? %>
+  access_log <%= @additional_access_log %>;
+  <% end %>
   <% if @access_log_options == 'off' %>
+  <% if @additional_access_log.nil? %>
   access_log off;
+  <% end %>
   <% else %>
   access_log <%= @access_log %><% unless @access_log_options.empty? %> <%= @access_log_options %><% end %>;
   <% end %>

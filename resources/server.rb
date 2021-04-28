@@ -22,6 +22,7 @@ property :resolver_valid, Integer, default: 600
 property :resolver_timeout, Integer, default: 10
 property :access_log_options, String, default: 'combined'
 property :error_log_options, String, default: 'error'
+property :additional_access_log, [String, NilClass], default: nil
 
 property :postgres_host, String, required: true
 property :postgres_port, Integer, required: true
@@ -327,6 +328,7 @@ action :install do
     sentry_host: new_resource.host,
     sentry_port: new_resource.port,
     secure: new_resource.secure,
+    additional_access_log: new_resource.additional_access_log,
     access_log_options: new_resource.access_log_options,
     error_log_options: new_resource.error_log_options,
   }
