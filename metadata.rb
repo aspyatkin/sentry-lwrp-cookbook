@@ -2,7 +2,7 @@ name 'sentry-lwrp'
 maintainer 'Alexander Pyatkin'
 maintainer_email 'aspyatkin@gmail.com'
 license 'MIT'
-version '0.4.4'
+version '0.4.5'
 description 'Installs and configures Sentry server'
 
 source_url 'https://github.com/aspyatkin/sentry-lwrp-cookbook' if respond_to?(:source_url)

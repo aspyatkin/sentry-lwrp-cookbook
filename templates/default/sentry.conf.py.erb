@@ -3,6 +3,8 @@
 from sentry.conf.server import *
 
 import os.path
+import socket
+socket.setdefaulttimeout(10)
 
 CONF_ROOT = os.path.dirname(__file__)
 
